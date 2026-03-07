@@ -684,6 +684,7 @@ class Visitor:
         self.page = page
         self.x = 0
         self.y = 0
+        self.used_width = 0
         self.indent_stack = [self.x]
         self.font_stack = ["default"]
         self.color_stack = [(0, -1)]  # fg, bg
@@ -741,6 +742,7 @@ class Visitor:
     def _crlf(self, margin: bool = False, wrap_margin: bool = False):
         # carriage return
         self.x = self.indent_stack[-1]
+        self.used_width = self.x
         # line feed
         self.y += self.font_height
         if margin:
@@ -804,15 +806,16 @@ class Visitor:
 
     def visit_text(self, token):
         content = token.content
-        max_width = WIDTH - self.x
-        if DEBUG:
-            self.img.rectb(self.x, self.y, max_width, self.font_height, 2)
         while content:
             i = len(content)
             w = self.font.text_width(content)
-            while w > max_width:
+            while w + self.used_width > WIDTH:
                 i -= 1
                 w = self.font.text_width(content[:i])
+            if DEBUG:
+                self.img.rectb(self.x, self.y, w, self.font_height, 2)
+                print(f"{self.used_width=}, {self.x=}, {w=}, {content[:i]}")
+            self.used_width += w
             self._text(content[:i])
             content = content[i:]
             if content:
@@ -844,7 +847,9 @@ class Visitor:
         x = self.x
         self._text(self.list_marker)  # Ideally this should use a negative indent
         self.x = x  # Restore the original x position
-        self._indent(max(self.font_height, self.font.text_width(self.list_marker)))
+        w = self.font.text_width(self.list_marker)
+        self.used_width += w
+        self._indent(max(self.font_height, w))
 
     def visit_list_item_close(self, token):
         self._dedent()
