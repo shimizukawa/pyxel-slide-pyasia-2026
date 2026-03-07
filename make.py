@@ -18,14 +18,14 @@ PACKAGE_NAME = "pyxel-slide"
 
 @click.command()
 def run():
-    """Pixelアプリを実行"""
-    # カレントディレクトリをPACKAGE_NAMEに変更して実行する
+    """Invoke Pyxel Slide App"""
+    # invoke main.py in PACKAGE_NAME directory with uv
     subprocess.run(["uv", "run", "main.py"], cwd=PACKAGE_NAME)
 
 
 @click.command()
 def package():
-    """Pyxelパッケージを作成"""
+    """Build Pyxel Slide App package"""
     shutil.rmtree(f"./{PACKAGE_NAME}/__pycache__", ignore_errors=True)
     shutil.rmtree(f"./{PACKAGE_NAME}/assets/__pycache__", ignore_errors=True)
     subprocess.run(
@@ -42,8 +42,8 @@ def package():
 
 @click.command()
 def revealjs():
-    """Sphinx-Reveal.jsでHTMLスライド生成"""
-    # sphinx-build -M revealjs PACKAGE_NAME build を実行する
+    """Build Sphinx-Reveal.js version"""
+    # invoke: sphinx-build -M revealjs PACKAGE_NAME build
     subprocess.run(
         [
             "sphinx-build",
@@ -53,7 +53,7 @@ def revealjs():
             "build",
         ]
     )
-    # Pythonからブラウザで build/revealjs/slide-ja.html を開く
+    # Open build/revealjs/slide-ja.html in browser from Python
     # slide_path = Path("build/revealjs/slide-ja.html").resolve()
     # webbrowser.open_new_tab(slide_path.as_uri())
 
@@ -65,10 +65,10 @@ def revealjs():
 
 @click.group()
 def cli():
-    """pyxel-slide 用ユーティリティ。サブコマンドで操作します。"""
+    """pyxel-slide utility. Operate with subcommands."""
 
 
-# サブコマンド登録
+# Subcommands
 cli.add_command(run)
 cli.add_command(package)
 cli.add_command(revealjs)

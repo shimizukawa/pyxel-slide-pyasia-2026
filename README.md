@@ -1,63 +1,71 @@
-# Pyxel Advent Calendar 2025 / Day 16, 2025.12.16
+# Python ASIA 2026 / 2026.03.21 @ Manila, Philippines
 
-Markdownで書いたスライドをPyxelゲームエンジンで表示します。
+Pyxel Slide renders markdown slides on Pyxel retro game engine for Python.
 
 Pyxelスライドのデモ
 
-- https://shimizukawa.github.io/pyxel-slide-2025/
+- https://shimizukawa.github.io/pyxel-slide-pyasia-2026/
 
 Sphinx-Reveal.js版
 
-- https://shimizukawa.github.io/pyxel-slide-2025/revealjs/slide-ja.html
+- https://shimizukawa.github.io/pyxel-slide-pyasia-2026/revealjs/slide-en.html
 
-Blog版
+## Run
 
-- https://www.freia.jp/taka/blog/2025/12/pyxel-slide/index.html
-
-## 実行
-
-Pyxelアプリ起動
+Invoke Pyxel Slide App
 
 ```shell
 uv run make.py run
 ```
 
-Pyxelパッケージ作成
+Build Pyxel Slide App package
 
 ```shell
 uv run make.py package
 ```
 
-Sphinx-Reveal.jsでスライド生成
+Build Sphinx-Reveal.js version
 
 ```shell
 uv run make.py revealjs
 ```
 
-## 操作
+## Available Controls
 
-- 移動:
-  - スペース: 次のスライド
-  - シフト+スペース: 前のスライド
-  - 下: セクション内の次スライド
-  - 上: セクション内の前スライド
-  - 右: 次のセクション
-  - 左: 前のセクション
-- リロード: Ctrl+R
-- 終了: Ctrl+Q
+Keyboard
 
-## サポートしている機能
+- Move:
+  - Space: Next slide
+  - Shift+Space: Previous slide
+  - Down: Next slide in section
+  - Up: Previous slide in section
+  - Right: Next section
+  - Left: Previous section
+- Reload: Ctrl+R
+- Quit: Ctrl+Q
 
-- 日本語表示対応
-- 対応している記法
-  - ヘディング1 = スライドタイトル
-  - ヘディング2 = 各ページタイトル
-  - 番号なし箇条書き
-  - 番号付き箇条書き
-  - **強調**
-  - *斜体*
-  - `literal`
+Gamepad
+
+- Move:
+  - BUTTON1: Next slide
+  - BUTTON2: Previous slide
+  - DOWN: Next slide in section
+  - UP: Previous slide in section
+  - RIGHT: Next section
+  - LEFT: Previous section
+- Reload: SELECT
+
+## Supported Markdown Syntax
+
+- Supported syntax
+  - Heading 1 = Slide title
+  - Heading 2 = Page title
+  - Unordered list
+  - Ordered list
+  - **Bold**
+  - *Italic*
+  - `Literal`
   - URL link
-  - コードフェンス（+ハイライト）
-  - 画像読み込み ( `{figure} file.png` )
-  - Pyxel App 読み込み ( `{figure} file.py` )
+  - Code fence (+highlight)
+  - Image inclusion ( `{figure} file.png` )
+  - Pyxel App inclusion ( `{figure} file.py` )

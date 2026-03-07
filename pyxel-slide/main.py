@@ -1,7 +1,4 @@
-# title: Pyxelで作るレトロプレゼンスライド
 # author: Takayuki Shimizukawa
-# desc: Pyxel Advent Calendar 2025 / Day 16, 2025.12.16
-# site: https://www.freia.jp/taka/slides/pyxel-slide/
 # license: MIT
 # version: 1.0
 #
@@ -28,14 +25,13 @@ from pathlib import Path
 import pyxel
 
 
-TITLE = "Pyxelで作るレトロプレゼンスライド"
 MD_FILENAME = "slide-ja.md"
 # DEBUG = True
 DEBUG = False
 
 LINE_NUMS = 12  # lines per page
-LINE_MARGIN_RATIO = 0.5  # フォント高さの50%（パラグラフ間）
-LINE_MARGIN_RATIO_WRAP = 0.25  # フォント高さの25%（折り返し時）
+LINE_MARGIN_RATIO = 0.5  # 50% of font height (between paragraphs)
+LINE_MARGIN_RATIO_WRAP = 0.25  # 25% of font height (on line wrap)
 DEFAULT_LINE_HEIGHT = int(12 * (1 + LINE_MARGIN_RATIO))  # default font height 12
 WINDOW_PADDING = DEFAULT_LINE_HEIGHT // 2
 HEIGHT = DEFAULT_LINE_HEIGHT * LINE_NUMS
@@ -58,7 +54,7 @@ FONTS = {
     "em": font_italic,
     "literal": font_literal,
 }
-LIST_MARKERS = ["使用しない", "●", "○", "■", "▲", "▼", "★"]
+LIST_MARKERS = ["unused", "●", "○", "■", "▲", "▼", "★"]
 
 DIRECTION_MAP = {
     ("f", "h2"): "right",
@@ -89,6 +85,24 @@ class Slide:
     level: str
 
 
+def get_slide_title(slide: Slide) -> str:
+    for token in slide.tokens:
+        if token.type == "heading_open" and token.tag in ("h1", "h2"):
+            title_token = next(
+                (t for t in slide.tokens if t.type == "inline" and t.map == token.map),
+                None,
+            )
+            if title_token:
+                if title_token.children:
+                    title = "".join(
+                        tok.content for tok in title_token.children if tok.type == "text"
+                    )
+                else:
+                    title = title_token.content
+                return title
+    raise ValueError("No title found in the slide.")
+
+
 class FPS:
     def __init__(self):
         self.value = 0
@@ -97,7 +111,7 @@ class FPS:
     def calc(self):
         self.frame_times.append(time.time())
         self.frame_times.pop(0)
-        # 10フレームごとにFPSを計算
+        # Calculate FPS every 10 frames
         if pyxel.frame_count % 10:
             return
         self.value = int(
@@ -142,7 +156,7 @@ class NavBtn:
         xlist = []
         ylist = []
         for x1, y1, x2, y2 in ((9, 9, 2, 9), (9, 9, 9, 2)):
-            # 原点を中心に45度回転した座標で直線の座標を計算
+            # Calculate line coordinates rotated 45 degrees around the origin
             rx1 = round(x1 * cos(c) - y1 * sin(c))
             ry1 = round(x1 * sin(c) + y1 * cos(c))
             rx2 = round(x2 * cos(c) - y2 * sin(c))
@@ -151,11 +165,11 @@ class NavBtn:
             ylist.append((ry1, ry2))
 
         if i == self.NEXT:
-            # DOWNの縦を縮小して中心寄りに配置
+            # Shorten the DOWN vertical and place it closer to center
             ylist[0] = (ylist[0][0] - 9, ylist[0][1] - 6)
             ylist[1] = (ylist[1][0] - 9, ylist[1][1] - 6)
         elif i == self.PREV:
-            # UPの縦を縮小して中心寄りに配置
+            # Shorten the UP vertical and place it closer to center
             ylist[0] = (ylist[0][0] + 9, ylist[0][1] + 6)
             ylist[1] = (ylist[1][0] + 9, ylist[1][1] + 6)
 
@@ -232,13 +246,17 @@ class NavBtn:
 class App:
     def __init__(self):
         self.fps = FPS()
+        self.slides = self.load_slides(MD_FILENAME)
+        if not self.slides:
+            raise ValueError("No slides found in the markdown file.")
+        title = get_slide_title(self.slides[0])
         pyxel.init(
             WIDTH + WINDOW_PADDING * 2,
             HEIGHT + WINDOW_PADDING,
-            title=TITLE,
+            title=title,
             quit_key=pyxel.KEY_NONE,
         )
-        self.colors = pyxel.colors.to_list()  # 親アプリ用のcolorsをバックアップ
+        self.colors = pyxel.colors.to_list()  # Backup colors for the parent app
         self._page = 0
         self.child_apps = {}
         nav_x, nav_y = pyxel.width - 20, pyxel.height - 20
@@ -261,22 +279,25 @@ class App:
             (None, pyxel.Image(WIDTH, HEIGHT)),
             (None, pyxel.Image(WIDTH, HEIGHT)),
         ]
-        self.first_pages_in_section = []  # セクションの開始ページ
+        self.first_pages_in_section = []  # First page index of each section
         self.slides = self.load_slides(MD_FILENAME)
-        self._page = min(self.page, len(self.slides) - 1)  # ページが減った場合
+        for i, slide in enumerate(self.slides):
+            if slide.level in ("h1", "h2"):
+                self.first_pages_in_section.append(i)
+        self._page = min(self.page, len(self.slides) - 1)  # In case the page count decreased
         self.in_transition = [0, 0, "down"]  # (rate(1..0), old_page, direction)
         for app in self.child_apps.values():
             sys.modules.pop(app.__module__, None)
-        self.child_apps = {}  # page: app
+        self.child_apps = {}  # key: page index, value: child app
         self.child_is_updated = False
-        self.links = {}  # page: [(x1, y1, x2, y2, url), ...]
+        self.links = {}  # key: page index, value: list of (x1, y1, x2, y2, url)
 
         # player
         self.player_image = pyxel.Image.from_image("assets/urban_rpg.png")
-        # 現在のページに応じた位置に配置
+        # Place at position based on current page
         x = WIDTH * self.page // max(1, len(self.slides) - 1)
         y = pyxel.height - 16
-        self.player = (x, y, 1, 0)  # (x, y, u, v) - 下向き静止状態
+        self.player = (x, y, 1, 0)  # (x, y, u, v) - facing down, idle
 
     def load_slides(self, filepath) -> list[Slide]:
         import markdown_it
@@ -302,9 +323,6 @@ class App:
         if slide_tokens:
             slides.append(Slide(path, sec, page, slide_tokens, slide_tokens[0].tag))
 
-        for i, slide in enumerate(slides):
-            if slide.level in ("h1", "h2"):
-                self.first_pages_in_section.append(i)
         return slides
 
     def load_child(
@@ -322,16 +340,16 @@ class App:
         for attr in dotted_module.split(".")[1:]:
             mod = getattr(mod, attr)
 
-        # scale処理
+        # Handle scale
         if scale is not None:
             width = int(width / scale)
             height = int(height / scale)
         a = self.child_apps[page] = mod.App(width, height)
         scale = scale or 1.0
-        # x 座標は、左パディングのみ考慮
+        # x coordinate: only left padding is considered
         a.__x = max((pyxel.width - width * scale) // 2, WINDOW_PADDING)
         a.__y = y
-        a.__colors = pyxel.colors.to_list()  # colorsバックアップ
+        a.__colors = pyxel.colors.to_list()  # Backup colors for child app
         a.__scale = scale
 
     @property
@@ -383,12 +401,12 @@ class App:
         self.page = self.first_pages_in_section[sec]
 
     def update_child(self):
-        """子アプリの更新
+        """Update the child app.
 
-        更新条件
-        - 子アプリのあるページを表示中
-        - transition中でない
-        - マウスが子アプリ内にある
+        Conditions to update:
+        - Currently showing a page that has a child app
+        - Not in a transition
+        - Mouse is inside the child app area
         """
         if self.page not in self.child_apps:
             return False
@@ -419,7 +437,7 @@ class App:
         if self.in_transition[0] > 0:
             self.in_transition[0] = self.in_transition[0] - 3 / self.fps
 
-        # リンククリック検出
+        # Check for link clicks
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.in_transition[0] <= 0:
             self.check_link_click()
 
@@ -429,7 +447,7 @@ class App:
         self.update_player()
 
     def check_link_click(self):
-        """マウス位置がリンク領域内ならブラウザで開く"""
+        """Open a link in the browser if the mouse is inside a link area."""
         if self.page not in self.links:
             return
 
@@ -444,42 +462,42 @@ class App:
         # Auto-walk player based on slide progress
         x, y, u, v = self.player
         
-        # Y座標は常に最下段に固定
+        # Y is always fixed at the bottom
         y = pyxel.height - 16
         
-        # スライド総数が1の場合は移動しない
+        # Do not move if there is only one slide
         if len(self.slides) <= 1:
-            self.player = (x, y, 1, 0)  # 下向き静止
+            self.player = (x, y, 1, 0)  # facing down, idle
             return
         
-        # 現在のページに応じた目標X座標を計算
+        # Calculate the target X position based on the current page
         target_x = WIDTH * self.page // (len(self.slides) - 1)
         
-        # 目標座標への移動
+        # Move toward the target position
         diff = target_x - x
         
         if abs(diff) >= 1:
-            # 距離が32px以上（キャラクター2つ分）以上なら走る
+            # Run if distance is 32px or more (2 character widths)
             if abs(diff) >= 32:
-                speed = 2  # 移動速度2倍
-                anim_div = 2  # アニメーション速度2倍
+                speed = 2  # Double movement speed
+                anim_div = 2  # Double animation speed
             else:
-                speed = 1  # 通常歩行
-                anim_div = 5  # 通常アニメーション速度
+                speed = 1  # Normal walk speed
+                anim_div = 5  # Normal animation speed
             
-            # 移動
+            # Move
             if diff > 0:
                 dx = speed
-                u, v = 3, 1  # 右向き、歩行準備
+                u, v = 3, 1  # Facing right, ready to walk
             else:
                 dx = -speed
-                u, v = 0, 1  # 左向き、歩行準備
+                u, v = 0, 1  # Facing left, ready to walk
             
-            # 歩行/走行アニメーション
+            # Walk/run animation
             v += [-1, 0, -1, 1][pyxel.frame_count // anim_div % 4]
             x += dx
         else:
-            # 停止: 下向き静止状態
+            # Stopped: facing down, idle
             u, v = 1, 0
         
         self.player = (x, y, u, v)
@@ -510,12 +528,12 @@ class App:
     def draw(self):
         pyxel.cls(7)
         self.blt_slide()
-        # 子アプリの描画
+        # Draw child app
         self.blt_child()
         self.blt_player()
         # Navigation
         self.draw_nav()
-        # FPSを表示
+        # Display FPS
         # pyxel.text(5, pyxel.height - 10, f"FPS: {self.fps}", 13)
 
     def render_page(self, page: int) -> pyxel.Image:
@@ -581,15 +599,15 @@ class App:
                 pyxel.dither(1.0)
 
     def blt_child(self):
-        """子アプリのオーバーレイ"""
+        """Overlay the child app onto the slide."""
         if self.page not in self.child_apps:
-            pyxel.colors.from_list(self.colors)  # 親アプリ用のcolorsに切替
+            pyxel.colors.from_list(self.colors)  # Restore colors for the parent app
             return
         if self.in_transition[0] > 0:
             return
 
         a = self.child_apps[self.page]
-        pyxel.colors.from_list(a.__colors)  # 子アプリ用のcolorsに切替
+        pyxel.colors.from_list(a.__colors)  # Switch to child app colors
         g = a.render()
         x = max((pyxel.width - g.width) // 2, WINDOW_PADDING)
         x = WINDOW_PADDING + a.__x
@@ -608,21 +626,21 @@ class App:
             self.page + 1 not in self.first_pages_in_section
             and self.page != len(self.slides) - 1
         ):
-            # セクション内の最後のページではない
+            # Not the last page in the section
             self.navs[NavBtn.DOWN].draw()  # ↓
         if self.page < self.first_pages_in_section[-1]:
-            # 最後のセクションではない
+            # Not the last section
             self.navs[NavBtn.RIGHT].draw()  # →
         if self.page not in self.first_pages_in_section:
-            # セクション内の最初のページではない
+            # Not the first page in the section
             self.navs[NavBtn.UP].draw()  # ↑
         if self.page != 0:
-            # 最初のセクションではない
+            # Not the first section
             self.navs[NavBtn.LEFT].draw()  # ←
         if self.page < len(self.slides) - 1:
-            # 最後のページではない
+            # Not the last page
             self.navs[NavBtn.NEXT].draw()  # SPACE
-        # self.navs[NavBtn.PREV].draw() # SHIFT+SPACE は描画しない
+        # self.navs[NavBtn.PREV].draw() # SHIFT+SPACE is not drawn
 
 
 def use_font(font: str):
@@ -671,7 +689,7 @@ class Visitor:
         self.color_stack = [(0, -1)]  # fg, bg
         self.section_level = 0
         self.align = "left"
-        self.list_stack = []  # 箇条書きのマーク用
+        self.list_stack = []  # For list markers (bullet/ordered)
         self.current_link = None  # リンク情報: {"x": x, "y": y, "url": url}
         self.app.links[page] = []
 
@@ -689,7 +707,7 @@ class Visitor:
 
     @property
     def font_height(self):
-        return self.font.text_width("あ")  # あの幅を文字の高さとする
+        return self.font.text_width("あ")  # Use the width of "あ" as the font height
 
     @property
     def list_marker(self):
@@ -702,13 +720,13 @@ class Visitor:
 
     def _text(self, text):
         w = self.font.text_width(text)
-        # アラインメント
+        # Alignment
         if self.align == "center":
             self.x = (WIDTH - w) // 2
         elif self.align == "right":
             self.x = WIDTH - w
 
-        # 背景色
+        # Background color
         if self.bgcolor >= 0:
             self.img.rect(self.x, self.y, w, self.font_height, self.bgcolor)
 
@@ -717,7 +735,7 @@ class Visitor:
 
         self.img.text(self.x, self.y, text, self.color, self.font)
 
-        # バグ: centerやrightの場合は連続で _text が呼ばれると位置がずれる
+        # Bug: position shifts when _text is called consecutively with center or right alignment
         self.x += w
 
     def _crlf(self, margin: bool = False, wrap_margin: bool = False):
@@ -726,10 +744,10 @@ class Visitor:
         # line feed
         self.y += self.font_height
         if margin:
-            # 文字高さの50%分のマージンを追加（パラグラフ間）
+            # Add 50% of font height as margin (between paragraphs)
             self.y += int(self.font_height * LINE_MARGIN_RATIO)
         elif wrap_margin:
-            # 文字高さの25%分のマージンを追加（折り返し時）
+            # Add 25% of font height as margin (on line wrap)
             self.y += int(self.font_height * LINE_MARGIN_RATIO_WRAP)
 
     def _indent(self, indent):
@@ -824,8 +842,8 @@ class Visitor:
 
     def visit_list_item_open(self, token):
         x = self.x
-        self._text(self.list_marker)  # 本当はここでマイナスインデントするのが良いかも？
-        self.x = x  # 元の位置に戻す
+        self._text(self.list_marker)  # Ideally this should use a negative indent
+        self.x = x  # Restore the original x position
         self._indent(max(self.font_height, self.font.text_width(self.list_marker)))
 
     def visit_list_item_close(self, token):
@@ -869,7 +887,7 @@ class Visitor:
             x, y = self.current_link["x"], self.current_link["y"]
             url = self.current_link["url"]
             self.img.line(x, y + self.font_height, self.x, y + self.font_height, 5)
-            # リンク領域を登録
+            # Register the link area
             if url:
                 self.app.links[self.page].append((x, y, self.x, y + self.font_height, url))
             self.current_link = None
@@ -887,14 +905,14 @@ class Visitor:
 
         content = token.content
 
-        # 背景描画
+        # Draw background
         hls = [self.font.text_width(line) for line in content.splitlines()]
-        lh = self.font.text_width("あ")  # あの幅を文字の高さとする
+        lh = self.font.text_width("あ")  # Use the width of "あ" as the font height
         w = lh + max(hls)
-        h = lh + len(hls) * lh  # 余白用に1行多く確保
+        h = lh + len(hls) * lh  # Extra row for padding
         self.img.rect(self.x, self.y, w, h, 0)
 
-        # コンテンツ描画
+        # Draw content
         self._indent(WINDOW_PADDING)
         self.y += lh // 2
 
@@ -909,7 +927,7 @@ class Visitor:
         self._dedent()
 
     def _directive(self, token):
-        """ディレクティブ処理
+        """Process a directive block.
 
         ```{directive} args
         :opt1: value1
@@ -917,15 +935,15 @@ class Visitor:
         content
         ```
 
-        - `{figure}`: 画像表示
+        - `{figure}`: Display an image or app
           - args = "filename.*"
-            - `.py` ではアプリ読み込み
-            - `.png`, `.jpg` では画像読み込み
-            - `.*` では上記の順番にトライ
+            - `.py`: load as a Pyxel app
+            - `.png`, `.jpg`: load as an image
+            - `.*`: try the above in order
           - options:
-            - `scale`: 50 （50% 表記は非対応）
-            - `wdith`: 200 （200px 表記は非対応）
-            - `height`: 100 （100px 表記は非対応）
+            - `scale`: 50 (percentage notation like "50%" is not supported)
+            - `width`: 200 (pixel notation like "200px" is not supported)
+            - `height`: 100 (pixel notation like "100px" is not supported)
         """
         m = directive_pattern.match(token.info)
         directive, args = m.groups()
@@ -1020,7 +1038,7 @@ class Visitor:
             self._crlf(margin=True)
 
 
-# micropipがasync/awaitを要求するため
+# micropip requires async/await
 async def main():
     try:
         import micropip
@@ -1040,8 +1058,8 @@ async def main():
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     if loop.is_running():
-        # Pyodide上では用意されているイベントループを使って実行
+        # On Pyodide, use the existing event loop
         asyncio.ensure_future(main())
     else:
-        # ローカルの場合はあらたにイベントループで実行
+        # Locally, run with a new event loop
         asyncio.run(main())
