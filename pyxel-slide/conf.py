@@ -3,7 +3,7 @@ copyright = "2025, shimizukawa"
 author = "shimizukawa"
 release = "2025.12.16"
 language = "ja"
-root_doc = "slide-ja"
+root_doc = "slide-en"
 
 extensions = [
     "myst_parser",

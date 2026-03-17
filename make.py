@@ -35,7 +35,7 @@ def package():
     Path("./dist").mkdir(exist_ok=True, parents=True)
     shutil.move(f"{PACKAGE_NAME}.pyxapp", f"dist/{PACKAGE_NAME}.pyxapp")
     shutil.copyfile(f"{PACKAGE_NAME}/index.html", "dist/index.html")
-    shutil.copyfile(f"{PACKAGE_NAME}/slide-ja.md", "dist/slide-ja.md")
+    shutil.copyfile(f"{PACKAGE_NAME}/slide-en.md", "dist/slide-en.md")
     if Path(f"./{PACKAGE_NAME}/assets").exists():
         shutil.copytree(f"./{PACKAGE_NAME}/assets", "dist/assets", dirs_exist_ok=True)
 
@@ -53,8 +53,8 @@ def revealjs():
             "build",
         ]
     )
-    # Open build/revealjs/slide-ja.html in browser from Python
-    # slide_path = Path("build/revealjs/slide-ja.html").resolve()
+    # Open build/revealjs/slide-en.html in browser from Python
+    # slide_path = Path("build/revealjs/slide-en.html").resolve()
     # webbrowser.open_new_tab(slide_path.as_uri())
 
     Path("./dist").mkdir(exist_ok=True, parents=True)

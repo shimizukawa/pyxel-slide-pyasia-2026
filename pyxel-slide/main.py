@@ -25,7 +25,7 @@ from pathlib import Path
 import pyxel
 
 
-MD_FILENAME = "slide-ja.md"
+MD_FILENAME = "slide-en.md"
 # DEBUG = True
 DEBUG = False
 
