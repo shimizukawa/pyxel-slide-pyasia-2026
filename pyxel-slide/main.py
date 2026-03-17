@@ -1045,24 +1045,20 @@ class Visitor:
 
 # micropip requires async/await
 async def main():
-    try:
+    if sys.platform == "emscripten":
         import micropip
-    except ImportError:
-        micropip = None
-
-    if micropip:
         print("Installing ...")
-        await micropip.install("markdown-it-py")
-        await micropip.install("linkify-it-py")
-        await micropip.install("pygments")
+        await micropip.install([
+            "markdown-it-py[linkify]",
+            "pygments"
+        ])
         print("installed successfully")
 
     App()
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    if loop.is_running():
+    if sys.platform == "emscripten":
         # On Pyodide, use the existing event loop
         asyncio.ensure_future(main())
     else:
