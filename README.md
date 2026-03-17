@@ -2,11 +2,11 @@
 
 Pyxel Slide renders markdown slides on Pyxel retro game engine for Python.
 
-Pyxelスライドのデモ
+Pyxel Slide Demo
 
 - https://shimizukawa.github.io/pyxel-slide-pyasia-2026/
 
-Sphinx-Reveal.js版
+Sphinx-Reveal.js Version
 
 - https://shimizukawa.github.io/pyxel-slide-pyasia-2026/revealjs/slide-en.html
 

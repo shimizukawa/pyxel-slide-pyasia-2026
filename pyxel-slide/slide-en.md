@@ -254,5 +254,5 @@ For some reason, I never seem to make progress on actual game development!<br>
 - You can create slides using Markdown syntax.
 - You can embed Pyxel games and run them during your presentation.
 - The source code is available here:
-  - https://github.com/shimizukawa/pyxel-slide-2025
+  - https://github.com/shimizukawa/pyxel-slide-pyasia-2026
 
