@@ -256,7 +256,7 @@ class App:
             title=title,
             quit_key=pyxel.KEY_NONE,
         )
-        self.colors = pyxel.colors.to_list()  # Backup colors for the parent app
+        self.colors = list(pyxel.colors)  # Backup colors for the parent app
         self._page = 0
         self.child_apps = {}
         nav_x, nav_y = pyxel.width - 20, pyxel.height - 20
@@ -349,7 +349,7 @@ class App:
         # x coordinate: only left padding is considered
         a.__x = max((pyxel.width - width * scale) // 2, WINDOW_PADDING)
         a.__y = y
-        a.__colors = pyxel.colors.to_list()  # Backup colors for child app
+        a.__colors = list(pyxel.colors)  # Backup colors for child app
         a.__scale = scale
 
     @property
@@ -601,13 +601,13 @@ class App:
     def blt_child(self):
         """Overlay the child app onto the slide."""
         if self.page not in self.child_apps:
-            pyxel.colors.from_list(self.colors)  # Restore colors for the parent app
+            pyxel.colors[:] = self.colors  # Restore colors for the parent app
             return
         if self.in_transition[0] > 0:
             return
 
         a = self.child_apps[self.page]
-        pyxel.colors.from_list(a.__colors)  # Switch to child app colors
+        pyxel.colors[:] = a.__colors  # Switch to child app colors
         g = a.render()
         x = max((pyxel.width - g.width) // 2, WINDOW_PADDING)
         x = WINDOW_PADDING + a.__x
