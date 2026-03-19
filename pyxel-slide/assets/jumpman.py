@@ -87,14 +87,15 @@ class Player:
         self.frame_count = pyxel.frame_count
         global scroll_x
         last_y = self.y
-        if pyxel.btn(pyxel.KEY_LEFT):
-            self.dx = -1 * (2 if pyxel.btn(pyxel.KEY_SHIFT) else 1)
+        is_dashing = pyxel.btn(pyxel.KEY_SHIFT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_B)
+        if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_LEFT):
+            self.dx = -1 * (2 if is_dashing else 1)
             self.direction = -1
-        if pyxel.btn(pyxel.KEY_RIGHT):
-            self.dx = 1 * (2 if pyxel.btn(pyxel.KEY_SHIFT) else 1)
+        if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_RIGHT):
+            self.dx = 1 * (2 if is_dashing else 1)
             self.direction = 1
         self.dy = min(self.dy + 1, 3)
-        if pyxel.btnp(pyxel.KEY_SPACE):
+        if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_A):
             if self.dy == 3 and not self.is_falling:  # 落下3で落ちていない状態
                 self.dy = -7
         self.x, self.y = push_back(self.x, self.y, self.dx, self.dy)
@@ -156,13 +157,13 @@ class App:
 
     def update(self):
         global is_loose, show_bb, is_pback
-        if pyxel.btnp(pyxel.KEY_1):
+        if pyxel.btnp(pyxel.KEY_1) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_X):
             show_bb = not show_bb
-        elif pyxel.btnp(pyxel.KEY_2):
+        elif pyxel.btnp(pyxel.KEY_2) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_Y):
             is_loose = not is_loose
-        elif pyxel.btnp(pyxel.KEY_3):
+        elif pyxel.btnp(pyxel.KEY_3) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_BACK):
             is_pback = not is_pback
-        elif pyxel.btnp(pyxel.KEY_4):
+        elif pyxel.btnp(pyxel.KEY_4) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_START):
             game_over()
         player.update()
 
