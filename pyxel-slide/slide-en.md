@@ -9,32 +9,38 @@ Python ASIA 2026 \
 ### Introduction
 
 - What is this slide?
+- What is the Retro Game Engine Pyxel?
 - What is the Retro Presentation Slide?
 - What is a Markdown Slide Renderer?
 
 ### What is this slide?
 
-This is "Retro Presentation Slide" about "[Pyxel]" — a tool that lets you make retro games with Python.
+This is "Retro Presentation Slide" built with "[Pyxel]" — a tool that lets you make retro games with Python.
 
 <br>
 
 [Pyxel]: https://github.com/kitao/pyxel
 
+```{figure} assets/face-dot.png
+:scale: 70
+```
 
 Author: @shimizukawa
 
-```{figure} assets/face-dot.png
-:scale: 50
-```
-
 <br>
 
-<br>
+- I started programming Around 1990, because I wanted to create games.
+- At that time, tools like C, ASM, and DirectX were too hard, so I never finished anything.
+- Now I'm using Pyxel to try again and build the games I always     dreamed of!
 
-- Around 1990, I started programming because I wanted to make games.
-- Back then, tools like C, ASM, and DirectX were too hard, so I never finished anything.
-- Now I'm using Pyxel to try again and build the games I always dreamed of!
+### What is the Retro Game Engine Pyxel?
 
+- Pyxel is a retro game engine developed by Kitao-san
+- Pyxel is attractive because of:
+  - its ability to create NES-like retro games in Python
+  - its simple and intuitive API
+  - its expressive power limited to 16-colors and 4-sounds
+- On top of this strong Pyxel limitation, I created a presence-slide viewer that requires expressive power.
 
 ### What are Retro Presentation Slides?
 
