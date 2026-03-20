@@ -20,7 +20,6 @@ import enum
 import itertools
 import re
 import sys
-import time
 import webbrowser
 from pathlib import Path
 from random import randint, choice
@@ -39,6 +38,7 @@ DEFAULT_LINE_HEIGHT = int(12 * (1 + LINE_MARGIN_RATIO))  # default font height 1
 WINDOW_PADDING = DEFAULT_LINE_HEIGHT // 2
 HEIGHT = DEFAULT_LINE_HEIGHT * LINE_NUMS
 WIDTH = HEIGHT * 16 // 9
+FPS = 30
 KEY_REPEAT = 1  # for 30fps
 KEY_HOLD = 15  # for 30fps
 print(f"{WIDTH=}, {HEIGHT=}")
@@ -97,34 +97,6 @@ def get_slide_title(slide: Slide) -> str:
                     title = title_token.content
                 return title
     raise ValueError("No title found in the slide.")
-
-
-class FPS:
-    def __init__(self):
-        self.value = 0
-        self.frame_times = [time.time()] * 30
-
-    def calc(self):
-        self.frame_times.append(time.time())
-        self.frame_times.pop(0)
-        # Calculate FPS every 10 frames
-        if pyxel.frame_count % 10:
-            return
-        self.value = int(
-            len(self.frame_times) / (self.frame_times[-1] - self.frame_times[0])
-        )
-
-    def __rmul__(self, other):
-        return self.value * other
-
-    def __rtruediv__(self, other):
-        return other / self.value
-
-    def __floordiv__(self, other):
-        return self.value // other
-
-    def __str__(self):
-        return str(self.value)
 
 
 class NavBtn:
@@ -306,6 +278,10 @@ class Paging:
     def is_slow(self):
         return self.mode in (self.Mode.DITHER_SLOW, self.Mode.NONE_SLOW)
 
+    @property
+    def delta(self) -> float:
+        return (1 if self.is_slow else 3) / FPS
+
     def rotate(self):
         ml = list(self.Mode)
         idx = (ml.index(self.mode) + 1) % len(ml)
@@ -313,13 +289,12 @@ class Paging:
         self._changed_frame = pyxel.frame_count
 
     def draw(self, font: pyxel.Font | None = None):
-        if self._changed_frame + 30 > pyxel.frame_count:
+        if self._changed_frame + 60 > pyxel.frame_count:
             pyxel.text(0, 0, f"Paging Mode: {self.mode.name}", 0, font)
 
 
 class App:
     def __init__(self):
-        self.fps = FPS()
         self.slides = self.load_slides(MD_FILENAME)
         if not self.slides:
             raise ValueError("No slides found in the markdown file.")
@@ -328,6 +303,7 @@ class App:
             WIDTH + WINDOW_PADDING * 2,
             HEIGHT + WINDOW_PADDING,
             title=title,
+            fps=FPS,
             quit_key=pyxel.KEY_NONE,
             display_scale=1,
         )
@@ -500,7 +476,6 @@ class App:
         return False
 
     def update(self):
-        self.fps.calc()
         self.child_is_updated = self.update_child()
         if self.child_is_updated:
             return
@@ -515,7 +490,7 @@ class App:
             self.paging.rotate()
 
         if self.in_transition[0] > 0:
-            self.in_transition[0] = self.in_transition[0] - 3 / self.fps
+            self.in_transition[0] = self.in_transition[0] - self.paging.delta
 
         # Check for link clicks
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.in_transition[0] <= 0:
@@ -631,8 +606,6 @@ class App:
         self.blt_player()
         # Navigation
         self.draw_nav()
-        # Display FPS
-        # pyxel.text(5, pyxel.height - 10, f"FPS: {self.fps}", 13)
         # Display Paging Mode
         self.paging.draw(self.fonts.default)
 
