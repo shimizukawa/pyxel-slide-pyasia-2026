@@ -157,9 +157,9 @@ class App:
 
     def update(self):
         global is_loose, show_bb, is_pback
-        if pyxel.btnp(pyxel.KEY_1) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_X):
+        if pyxel.btnp(pyxel.KEY_1) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_Y):
             show_bb = not show_bb
-        elif pyxel.btnp(pyxel.KEY_2) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_Y):
+        elif pyxel.btnp(pyxel.KEY_2) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_X):
             is_loose = not is_loose
         elif pyxel.btnp(pyxel.KEY_3) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_BACK):
             is_pback = not is_pback
