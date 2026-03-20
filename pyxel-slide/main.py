@@ -255,6 +255,7 @@ class App:
             HEIGHT + WINDOW_PADDING,
             title=title,
             quit_key=pyxel.KEY_NONE,
+            display_scale=1,
         )
         self.colors = list(pyxel.colors)  # Backup colors for the parent app
         self._page = 0
