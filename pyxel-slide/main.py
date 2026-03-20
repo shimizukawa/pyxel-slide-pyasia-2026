@@ -293,6 +293,69 @@ class Paging:
             pyxel.text(0, 0, f"Paging Mode: {self.mode.name}", 0, font)
 
 
+class ChildAppProxy:
+
+    def __init__(self, filename: str, x: int, y: int, w: int, h: int, s: float | None):
+        self.app = self.load_child(filename, x, y, w, h, s)
+
+    def load_child(
+        self,
+        filename: str,
+        x: int,
+        y: int,
+        w: int,
+        h: int,
+        s: float | None,
+    ):
+        dotted_module = filename.replace("/", ".").replace("\\", ".").replace(".py", "")
+        mod = __import__(dotted_module)
+        for attr in dotted_module.split(".")[1:]:
+            mod = getattr(mod, attr)
+
+        # Handle scale
+        if s is not None:
+            w = int(w / s)
+            h = int(h / s)
+        a = mod.App(w, h)
+        s = s or 1.0
+        # x coordinate: only left padding is considered
+        a.__x = max((pyxel.width - w * s) // 2, WINDOW_PADDING)
+        a.__y = y
+        a.__colors = list(pyxel.colors)  # Backup colors for child app
+        a.__scale = s
+
+        return a
+
+    def blt(self):
+        a = self.app
+        pyxel.colors[:] = a.__colors  # Switch to child app colors
+        g = a.render()
+        x = max((pyxel.width - g.width) // 2, WINDOW_PADDING)
+        x = WINDOW_PADDING + a.__x
+        y = WINDOW_PADDING + a.__y
+        s1 = a.__scale or 1
+        s2 = (1 - s1) / 2
+        w, h = g.width, g.height
+        pyxel.blt(x - int(w * s2), y - int(h * s2), g, 0, 0, w, h, scale=a.__scale)
+        if self.is_active:
+            pyxel.rectb(x, y, int(w * s1), int(h * s1), 8)
+
+    def unload(self):
+        sys.modules.pop(self.app.__module__, None)
+
+    @property
+    def is_active(self):
+        a = self.app
+        if (a.__x <= pyxel.mouse_x - WINDOW_PADDING < a.__scale * a.width + a.__x) and (
+            a.__y <= pyxel.mouse_y - WINDOW_PADDING < a.__scale * a.height + a.__y
+        ):
+            return True
+        return False
+    
+    def update(self):
+        self.app.update()
+
+
 class App:
     def __init__(self):
         self.slides = self.load_slides(MD_FILENAME)
@@ -339,7 +402,7 @@ class App:
         self._page = min(self.page, len(self.slides) - 1)  # In case the page count decreased
         self.in_transition = [0, 0, "down"]  # (rate(1..0), old_page, direction)
         for app in self.child_apps.values():
-            sys.modules.pop(app.__module__, None)
+            app.unload()
         self.child_apps = {}  # key: page index, value: child app
         self.child_is_updated = False
         self.links = {}  # key: page index, value: list of (x1, y1, x2, y2, url)
@@ -377,33 +440,6 @@ class App:
             slides.append(Slide(path, sec, page, slide_tokens, slide_tokens[0].tag))
 
         return slides
-
-    def load_child(
-        self,
-        page: int,
-        x: int,
-        y: int,
-        width: int,
-        height: int,
-        filename: str,
-        scale: float | None,
-    ):
-        dotted_module = filename.replace("/", ".").replace("\\", ".").replace(".py", "")
-        mod = __import__(dotted_module)
-        for attr in dotted_module.split(".")[1:]:
-            mod = getattr(mod, attr)
-
-        # Handle scale
-        if scale is not None:
-            width = int(width / scale)
-            height = int(height / scale)
-        a = self.child_apps[page] = mod.App(width, height)
-        scale = scale or 1.0
-        # x coordinate: only left padding is considered
-        a.__x = max((pyxel.width - width * scale) // 2, WINDOW_PADDING)
-        a.__y = y
-        a.__colors = list(pyxel.colors)  # Backup colors for child app
-        a.__scale = scale
 
     @property
     def page(self):
@@ -467,9 +503,7 @@ class App:
             return False
 
         a = self.child_apps[self.page]
-        if (a.__x <= pyxel.mouse_x - WINDOW_PADDING < a.__scale * a.width + a.__x) and (
-            a.__y <= pyxel.mouse_y - WINDOW_PADDING < a.__scale * a.height + a.__y
-        ):
+        if a.is_active:
             a.update()
             return True
 
@@ -682,17 +716,7 @@ class App:
             return
 
         a = self.child_apps[self.page]
-        pyxel.colors[:] = a.__colors  # Switch to child app colors
-        g = a.render()
-        x = max((pyxel.width - g.width) // 2, WINDOW_PADDING)
-        x = WINDOW_PADDING + a.__x
-        y = WINDOW_PADDING + a.__y
-        s1 = a.__scale or 1
-        s2 = (1 - s1) / 2
-        w, h = g.width, g.height
-        pyxel.blt(x - int(w * s2), y - int(h * s2), g, 0, 0, w, h, scale=a.__scale)
-        if self.child_is_updated:
-            pyxel.rectb(x, y, int(w * s1), int(h * s1), 8)
+        a.blt()
 
     def draw_nav(self):
         if self.child_is_updated:
@@ -1047,7 +1071,7 @@ class Visitor:
             w = int(options.pop("width", 355))
             h = int(options.pop("height", 200))
             module_file = matches[".py"].relative_to(Path().absolute())
-            self.app.load_child(self.page, self.x, self.y, w, h, str(module_file), s)
+            self.app.child_apps[self.page] = ChildAppProxy(str(module_file), self.x, self.y, w, h, s)
             if options:
                 print("Unsupported options", options)
             return
