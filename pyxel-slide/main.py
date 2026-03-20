@@ -38,21 +38,14 @@ HEIGHT = DEFAULT_LINE_HEIGHT * LINE_NUMS
 WIDTH = HEIGHT * 16 // 9
 KEY_REPEAT = 1  # for 30fps
 KEY_HOLD = 15  # for 30fps
-
-# The Font class only supports BDF format fonts
-font_title = pyxel.Font("assets/b24_b.bdf")
-font_pagetitle = pyxel.Font("assets/b16_b.bdf")
-font_default = pyxel.Font("assets/b12.bdf")
-font_bold = pyxel.Font("assets/b12_b.bdf")
-font_italic = pyxel.Font("assets/b12_i.bdf")
-font_literal = pyxel.Font("assets/b12.bdf")
-FONTS = {
-    "title": font_title,
-    "pagetitle": font_pagetitle,
-    "default": font_default,
-    "strong": font_bold,
-    "em": font_italic,
-    "literal": font_literal,
+print(f"{WIDTH=}, {HEIGHT=}")
+FONT_MAP = {
+    "title": "assets/b24_b.bdf",
+    "pagetitle": "assets/b16_b.bdf",
+    "default": "assets/b12.bdf",
+    "strong": "assets/b12_b.bdf",
+    "em": "assets/b12_i.bdf",
+    "literal": "assets/b12.bdf",
 }
 LIST_MARKERS = ["unused", "●", "○", "■", "▲", "▼", "★"]
 
@@ -243,6 +236,40 @@ class NavBtn:
             pyxel.line(ox + x1, oy + y1, ox + x2, oy + y2, col)
 
 
+class FontLoader:
+    def __init__(self, font_map):
+        self._font_cache = {}
+        self.is_init = False
+        self._init_process = None
+        self.fonts = {}
+        self.font_map = font_map
+
+    def _load_font(self):
+        for key, fn in self.font_map.items():
+            if fn not in self._font_cache:
+                font = pyxel.Font(fn)
+                self._font_cache[fn] = font
+            self.fonts[key] = self._font_cache[fn]
+            yield
+
+    def init_processing(self) -> bool:
+        """return True if it is still processing"""
+        print("init_processing")
+        if self.is_init:
+            return False
+        if self._init_process is None:
+            self._init_process = self._load_font()
+        try:
+            next(self._init_process)
+            return True
+        except StopIteration:
+            self.is_init = True
+            return False
+
+    def __getitem__(self, key):
+        return self.fonts[key]
+
+
 class App:
     def __init__(self):
         self.fps = FPS()
@@ -271,6 +298,7 @@ class App:
         ]
         pyxel.mouse(True)
         self.reset()
+        self.fonts = FontLoader(FONT_MAP)
 
         # run forever
         pyxel.run(self.update, self.draw)
@@ -528,6 +556,11 @@ class App:
 
     def draw(self):
         pyxel.cls(7)
+        if not self.fonts.is_init:
+            self.blt_player()
+            self.fonts.init_processing()
+            return
+
         self.blt_slide()
         # Draw child app
         self.blt_child()
@@ -705,7 +738,7 @@ class Visitor:
 
     @property
     def font(self):
-        return FONTS[self.font_stack[-1]]
+        return self.app.fonts[self.font_stack[-1]]
 
     @property
     def font_height(self):
