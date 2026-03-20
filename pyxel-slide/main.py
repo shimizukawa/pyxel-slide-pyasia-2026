@@ -11,6 +11,7 @@
 #     "pyxel",
 # ]
 # ///
+from __future__ import annotations
 
 import asyncio
 import contextlib
@@ -20,8 +21,9 @@ import re
 import sys
 import time
 import webbrowser
+from enum import IntEnum
 from pathlib import Path
-from random import randint
+from random import randint, choice
 
 import pyxel
 
@@ -272,9 +274,50 @@ class FontLoader:
 
     @property
     def default(self) -> pyxel.Font | None:
-        if self.fonts:
+        if "default" in self.fonts:
+            return self.fonts["default"]
+        elif self.fonts:
             return list(self.fonts.values())[0]
         return None
+
+    @property
+    def choiced(self) -> pyxel.Font | None:
+        if self.fonts:
+            return choice(list(self.fonts.values()))
+        return None
+
+
+class Paging:
+    class Mode(IntEnum):
+        NONE = 1
+        SLOW_NONE = 2
+        DITHER = 3
+        SLOW_DITHER = 4
+        _TERMINATE = 5
+
+    def __init__(self, mode = Mode.DITHER):
+        self._changed_frame = -100
+        self.mode = mode
+
+    @property
+    def is_dither(self):
+        return self.mode in (self.Mode.DITHER, self.Mode.SLOW_DITHER)
+
+    @property
+    def is_slow(self):
+        return self.mode in (self.Mode.SLOW_DITHER, self.Mode.SLOW_NONE)
+
+    def rotate(self) -> Mode:
+        next_mode = self.Mode(self.mode + 1)
+        if next_mode == self.Mode._TERMINATE:
+            next_mode = self.Mode.NONE
+        self._changed_frame = pyxel.frame_count
+        self.mode = next_mode
+        return self.mode
+
+    def draw(self, font: pyxel.Font | None = None):
+        if self._changed_frame + 30 > pyxel.frame_count:
+            pyxel.text(0, 0, f"Paging Mode: {self.mode.name}", 0, font)
 
 
 class App:
@@ -327,6 +370,7 @@ class App:
         self.child_apps = {}  # key: page index, value: child app
         self.child_is_updated = False
         self.links = {}  # key: page index, value: list of (x1, y1, x2, y2, url)
+        self.paging = Paging()
 
         # player
         self.player_image = pyxel.Image.from_image("assets/urban_rpg.png")
@@ -470,6 +514,9 @@ class App:
         if pyxel.btnp(pyxel.KEY_R) and pyxel.btn(pyxel.KEY_CTRL):
             self.reset()
 
+        if pyxel.btnp(pyxel.KEY_1):
+            self.paging.rotate()
+
         if self.in_transition[0] > 0:
             self.in_transition[0] = self.in_transition[0] - 3 / self.fps
 
@@ -565,7 +612,7 @@ class App:
         self.blt_player()
         # use default font to show if loaded, otherwise pyxel's built-in font
         msg = "NOW LOADING"
-        font = self.fonts.default
+        font = self.fonts.choiced
         if font:
             msg_width = font.text_width(msg)  # Assuming each character is 8 pixels wide
         else:
@@ -589,6 +636,8 @@ class App:
         self.draw_nav()
         # Display FPS
         # pyxel.text(5, pyxel.height - 10, f"FPS: {self.fps}", 13)
+        # Display Paging Mode
+        self.paging.draw(self.fonts.default)
 
     def render_page(self, page: int) -> pyxel.Image:
         """render page to old image bank"""
@@ -638,10 +687,12 @@ class App:
             new_img = self.get_rendered_img(self.page)
             old_img = self.get_rendered_img(old_page)
             # old
-            pyxel.dither(rate)
+            if self.paging.is_dither:
+                pyxel.dither(rate)
             pyxel.blt(old_x, old_y, old_img, 0, 0, WIDTH, HEIGHT, 7)
             # new
-            pyxel.dither(1 - rate)
+            if self.paging.is_dither:
+                pyxel.dither(1 - rate)
             pyxel.blt(new_x, new_y, new_img, 0, 0, WIDTH, HEIGHT, 7)
             pyxel.dither(1)
         else:
