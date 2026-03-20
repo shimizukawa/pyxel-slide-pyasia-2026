@@ -304,6 +304,7 @@ class ChildAppProxy:
         h: int,
         s: float | None,
     ):
+        # Loading module
         dotted_module = filename.replace("/", ".").replace("\\", ".").replace(".py", "")
         mod = __import__(dotted_module)
         for attr in dotted_module.split(".")[1:]:
@@ -320,10 +321,22 @@ class ChildAppProxy:
         self.y = y
         self.colors = list(pyxel.colors)  # Backup colors for child app
 
-    def blt(self):
-        a = self.app
+        # state
+        self.is_active = False
+        self.mouse_pos = (0, 0)
+
+    def update(self):
+        mouse_pos = (pyxel.mouse_x, pyxel.mouse_y)
+        if self.mouse_pos != mouse_pos:
+            self.is_active = self.is_mouse_in
+            self.mouse_pos = mouse_pos
+
+        if self.is_active:
+            self.app.update()
+
+    def draw(self):
         pyxel.colors[:] = self.colors  # Switch to child app colors
-        g = a.render()
+        g = self.app.render()
         x = max((pyxel.width - g.width) // 2, WINDOW_PADDING)
         x = WINDOW_PADDING + self.x
         y = WINDOW_PADDING + self.y
@@ -337,8 +350,11 @@ class ChildAppProxy:
     def unload(self):
         sys.modules.pop(self.app.__module__, None)
 
+    def toggle_active(self):
+        self.is_active = not(self.is_active)
+
     @property
-    def is_active(self):
+    def is_mouse_in(self):
         a = self.app
         if (self.x <= pyxel.mouse_x - WINDOW_PADDING < self.scale * a.width + self.x) and (
             self.y <= pyxel.mouse_y - WINDOW_PADDING < self.scale * a.height + self.y
@@ -346,9 +362,6 @@ class ChildAppProxy:
             return True
         return False
     
-    def update(self):
-        self.app.update()
-
 
 class App:
     def __init__(self):
@@ -366,7 +379,7 @@ class App:
         )
         self.colors = list(pyxel.colors)  # Backup colors for the parent app
         self._page = 0
-        self.child_apps = {}
+        self.child_apps: dict[str, ChildAppProxy] = {}
         nav_x, nav_y = pyxel.width - 20, pyxel.height - 20
         self.navs = [
             NavBtn(NavBtn.DOWN, nav_x, nav_y, 5, 9, self.go_next_page),
@@ -489,7 +502,7 @@ class App:
         Conditions to update:
         - Currently showing a page that has a child app
         - Not in a transition
-        - Mouse is inside the child app area
+        - child app area is active
         """
         if self.page not in self.child_apps:
             return False
@@ -497,11 +510,10 @@ class App:
             return False
 
         a = self.child_apps[self.page]
-        if a.is_active:
-            a.update()
-            return True
-
-        return False
+        if pyxel.btnp(pyxel.KEY_2) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_X):
+            a.toggle_active()
+        a.update()
+        return a.is_active
 
     def update(self):
         self.child_is_updated = self.update_child()
@@ -514,7 +526,7 @@ class App:
         if pyxel.btnp(pyxel.KEY_R) and pyxel.btn(pyxel.KEY_CTRL):
             self.reset()
 
-        if pyxel.btnp(pyxel.KEY_1):
+        if pyxel.btnp(pyxel.KEY_1) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_BACK):
             self.paging.rotate()
 
         if self.in_transition[0] > 0:
@@ -710,7 +722,7 @@ class App:
             return
 
         a = self.child_apps[self.page]
-        a.blt()
+        a.draw()
 
     def draw_nav(self):
         if self.child_is_updated:
