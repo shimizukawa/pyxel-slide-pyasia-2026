@@ -21,6 +21,7 @@ import sys
 import time
 import webbrowser
 from pathlib import Path
+from random import randint
 
 import pyxel
 
@@ -268,6 +269,12 @@ class FontLoader:
 
     def __getitem__(self, key):
         return self.fonts[key]
+
+    @property
+    def default(self) -> pyxel.Font | None:
+        if self.fonts:
+            return list(self.fonts.values())[0]
+        return None
 
 
 class App:
@@ -553,12 +560,25 @@ class App:
     def blt_player(self):
         # Draw players
         self.draw_players([{"player": self.player, "id": 0 }])
+    
+    def draw_loading(self):
+        self.blt_player()
+        # use default font to show if loaded, otherwise pyxel's built-in font
+        msg = "NOW LOADING"
+        font = self.fonts.default
+        if font:
+            msg_width = font.text_width(msg)  # Assuming each character is 8 pixels wide
+        else:
+            msg_width = len(msg) * 8  # Assuming each character is 8 pixels wide
+        x = (WIDTH - msg_width) // 2 + randint(-50, 50)
+        y = HEIGHT // 2 + randint(-30, 30)
+        pyxel.text(x, y, msg, randint(0, 6), font)
+        self.fonts.init_processing()
 
     def draw(self):
         pyxel.cls(7)
         if not self.fonts.is_init:
-            self.blt_player()
-            self.fonts.init_processing()
+            self.draw_loading()
             return
 
         self.blt_slide()
