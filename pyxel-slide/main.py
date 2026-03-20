@@ -295,10 +295,7 @@ class Paging:
 
 class ChildAppProxy:
 
-    def __init__(self, filename: str, x: int, y: int, w: int, h: int, s: float | None):
-        self.app = self.load_child(filename, x, y, w, h, s)
-
-    def load_child(
+    def __init__(
         self,
         filename: str,
         x: int,
@@ -316,27 +313,24 @@ class ChildAppProxy:
         if s is not None:
             w = int(w / s)
             h = int(h / s)
-        a = mod.App(w, h)
-        s = s or 1.0
+        self.app = mod.App(w, h)
+        self.scale = s = s or 1.0
         # x coordinate: only left padding is considered
-        a.__x = max((pyxel.width - w * s) // 2, WINDOW_PADDING)
-        a.__y = y
-        a.__colors = list(pyxel.colors)  # Backup colors for child app
-        a.__scale = s
-
-        return a
+        self.x = max((pyxel.width - w * s) // 2, WINDOW_PADDING)
+        self.y = y
+        self.colors = list(pyxel.colors)  # Backup colors for child app
 
     def blt(self):
         a = self.app
-        pyxel.colors[:] = a.__colors  # Switch to child app colors
+        pyxel.colors[:] = self.colors  # Switch to child app colors
         g = a.render()
         x = max((pyxel.width - g.width) // 2, WINDOW_PADDING)
-        x = WINDOW_PADDING + a.__x
-        y = WINDOW_PADDING + a.__y
-        s1 = a.__scale or 1
+        x = WINDOW_PADDING + self.x
+        y = WINDOW_PADDING + self.y
+        s1 = self.scale or 1
         s2 = (1 - s1) / 2
         w, h = g.width, g.height
-        pyxel.blt(x - int(w * s2), y - int(h * s2), g, 0, 0, w, h, scale=a.__scale)
+        pyxel.blt(x - int(w * s2), y - int(h * s2), g, 0, 0, w, h, scale=self.scale)
         if self.is_active:
             pyxel.rectb(x, y, int(w * s1), int(h * s1), 8)
 
@@ -346,8 +340,8 @@ class ChildAppProxy:
     @property
     def is_active(self):
         a = self.app
-        if (a.__x <= pyxel.mouse_x - WINDOW_PADDING < a.__scale * a.width + a.__x) and (
-            a.__y <= pyxel.mouse_y - WINDOW_PADDING < a.__scale * a.height + a.__y
+        if (self.x <= pyxel.mouse_x - WINDOW_PADDING < self.scale * a.width + self.x) and (
+            self.y <= pyxel.mouse_y - WINDOW_PADDING < self.scale * a.height + self.y
         ):
             return True
         return False
