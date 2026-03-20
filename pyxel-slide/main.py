@@ -28,8 +28,6 @@ import pyxel
 
 
 MD_FILENAME = "slide-en.md"
-# DEBUG = True
-DEBUG = False
 
 LINE_NUMS = 12  # lines per page
 LINE_MARGIN_RATIO = 0.5  # 50% of font height (between paragraphs)
@@ -396,7 +394,7 @@ class App:
         # run forever
         pyxel.run(self.update, self.draw)
 
-    def reset(self):
+    def reset(self, debug=False):
         self.renderd_page_bank = [
             (None, pyxel.Image(WIDTH, HEIGHT)),
             (None, pyxel.Image(WIDTH, HEIGHT)),
@@ -414,6 +412,7 @@ class App:
         self.child_is_updated = False
         self.links = {}  # key: page index, value: list of (x1, y1, x2, y2, url)
         self.paging = Paging()
+        self.debug = debug
 
         # player
         self.player_image = pyxel.Image.from_image("assets/urban_rpg.png")
@@ -523,11 +522,15 @@ class App:
         if pyxel.btnp(pyxel.KEY_Q) and pyxel.btn(pyxel.KEY_CTRL):
             pyxel.quit()
 
-        if pyxel.btnp(pyxel.KEY_R) and pyxel.btn(pyxel.KEY_CTRL):
+        if (pyxel.btnp(pyxel.KEY_R) and pyxel.btn(pyxel.KEY_CTRL)) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_START):
             self.reset()
 
         if pyxel.btnp(pyxel.KEY_1) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_BACK):
             self.paging.rotate()
+
+        if pyxel.btnp(pyxel.KEY_0) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_GUIDE):
+            self.debug = not self.debug
+            self.reset(self.debug)
 
         if self.in_transition[0] > 0:
             self.in_transition[0] = self.in_transition[0] - self.paging.delta
@@ -836,7 +839,7 @@ class Visitor:
         if self.bgcolor >= 0:
             self.img.rect(self.x, self.y, w, self.font_height, self.bgcolor)
 
-        if DEBUG:
+        if self.app.debug:
             self.img.rectb(self.x, self.y, w, self.font_height, 0)
 
         self.img.text(self.x, self.y, text, self.color, self.font)
@@ -917,7 +920,7 @@ class Visitor:
             while w + self.used_width > WIDTH:
                 i -= 1
                 w = self.font.text_width(content[:i])
-            if DEBUG:
+            if self.app.debug:
                 self.img.rectb(self.x, self.y, w, self.font_height, 2)
                 print(f"{self.used_width=}, {self.x=}, {w=}, {content[:i]}")
             self.used_width += w

@@ -41,8 +41,12 @@ Keyboard
   - Up: Previous slide in section
   - Right: Next section
   - Left: Previous section
-- Reload: Ctrl+R
-- Quit: Ctrl+Q
+- Function
+  - 0: Debug mode
+  - 1: Paging mode
+  - 2: Switch slide / chile app
+  - Ctrl+R: Reload
+  - Ctrl+Q: Quit
 
 Gamepad
 
@@ -53,7 +57,11 @@ Gamepad
   - UP: Previous slide in section
   - RIGHT: Next section
   - LEFT: Previous section
-- Reload: SELECT
+- Function
+  - X: Switch slide / chile app
+  - START: Reload
+  - BACK: Paging mode
+  - GUIDE: Debug mode
 
 ## Supported Markdown Syntax
 
