@@ -16,12 +16,12 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import dataclasses
+import enum
 import itertools
 import re
 import sys
 import time
 import webbrowser
-from enum import IntEnum
 from pathlib import Path
 from random import randint, choice
 
@@ -288,12 +288,11 @@ class FontLoader:
 
 
 class Paging:
-    class Mode(IntEnum):
-        NONE = 1
-        SLOW_NONE = 2
-        DITHER = 3
-        SLOW_DITHER = 4
-        _TERMINATE = 5
+    class Mode(enum.IntEnum):
+        DITHER = enum.auto()
+        NONE = enum.auto()
+        NONE_SLOW = enum.auto()
+        DITHER_SLOW = enum.auto()
 
     def __init__(self, mode = Mode.DITHER):
         self._changed_frame = -100
@@ -301,19 +300,17 @@ class Paging:
 
     @property
     def is_dither(self):
-        return self.mode in (self.Mode.DITHER, self.Mode.SLOW_DITHER)
+        return self.mode in (self.Mode.DITHER, self.Mode.DITHER_SLOW)
 
     @property
     def is_slow(self):
-        return self.mode in (self.Mode.SLOW_DITHER, self.Mode.SLOW_NONE)
+        return self.mode in (self.Mode.DITHER_SLOW, self.Mode.NONE_SLOW)
 
-    def rotate(self) -> Mode:
-        next_mode = self.Mode(self.mode + 1)
-        if next_mode == self.Mode._TERMINATE:
-            next_mode = self.Mode.NONE
+    def rotate(self):
+        ml = list(self.Mode)
+        idx = (ml.index(self.mode) + 1) % len(ml)
+        self.mode = ml[idx]
         self._changed_frame = pyxel.frame_count
-        self.mode = next_mode
-        return self.mode
 
     def draw(self, font: pyxel.Font | None = None):
         if self._changed_frame + 30 > pyxel.frame_count:
