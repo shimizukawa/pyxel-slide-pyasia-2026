@@ -525,10 +525,10 @@ class App:
         if (pyxel.btnp(pyxel.KEY_R) and pyxel.btn(pyxel.KEY_CTRL)) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_START):
             self.reset()
 
-        if pyxel.btnp(pyxel.KEY_1) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_BACK):
+        if pyxel.btnp(pyxel.KEY_1) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_BACK):
             self.paging.rotate()
 
-        if pyxel.btnp(pyxel.KEY_0) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_GUIDE):
+        if pyxel.btnp(pyxel.KEY_0) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_GUIDE):
             self.debug = not self.debug
             self.reset(self.debug)
 
