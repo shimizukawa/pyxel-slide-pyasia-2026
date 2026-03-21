@@ -9,8 +9,9 @@
 2. Pyxel User Guide https://kitao.github.io/pyxel/web/user-guide/
 3. Pyxel Showcase https://kitao.github.io/pyxel/web/showcase/
 4. My Pyxel Apps https://shimizukawa.github.io/pyxel-app/
-5. My Presentation Slide https://shimizukawa.github.io/pyxel-slide-pyasia-2026/
-6. My Presentation Repo https://github.com/shimizukawa/pyxel-slide-pyasia-2026/
+5. My Presentation Repo https://github.com/shimizukawa/pyxel-slide-pyasia-2026/
+6. My Presentation Slide https://shimizukawa.github.io/pyxel-slide-pyasia-2026/
+7. My Presentation Slide2 https://shimizukawa.github.io/pyxel-slide-pyasia-2026/revealjs/slide-en.html
 
 ## Descriptions
 

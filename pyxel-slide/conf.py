@@ -2,7 +2,7 @@ project = "pyxel-slide"
 copyright = "2025, shimizukawa"
 author = "shimizukawa"
 release = "2025.12.16"
-language = "ja"
+language = "en"
 root_doc = "slide-en"
 
 extensions = [

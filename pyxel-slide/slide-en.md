@@ -151,7 +151,7 @@ img.blt(
 
 Due to limitation
 colors and resolution,
-images can look blurry.
+images can look unclear.
 
 ### Embedding a Pyxel App Through img bank 1
 
@@ -193,12 +193,12 @@ You don't have to worry about layout, and it's easy to share and reuse.
 There are several tools that convert Markdown into HTML slides.
 They all use HTML as the renderer.
 
-- [Slidev] : A slide tool based on Vue.js
-- [Remark.js] : Renders Markdown slides in the browser
-- [Reveal.js] : An HTML slide framework
-  - [sphinx-revealjs] is a [Sphinx] extension that uses it
+- [Reveal.js], [Slidev], [Remark.js], and so on.
+- [sphinx-revealjs] is a [Sphinx] extension for Reveal.js
 
-I used these tools as a reference and built my own version with Pyxel.
+As a example: [sphinx-revealjs version of THIS SLIDE](https://shimizukawa.github.io/pyxel-slide-pyasia-2026/revealjs/slide-en.html)
+
+I referred to these tools as a SPEC reference and built my own version with Pyxel.
 
 [Reveal.js]: https://revealjs.com/
 [Remark.js]: https://remarkjs.com/
@@ -268,13 +268,18 @@ Supported Markdown syntax:
 
 ## Conclusion
 
+
 ### Conclusion
 
-For some reason, I never seem to make progress on actual game development!<br>
 
 - I built retro-style presentation slides using Pyxel.
 - You can create slides using Markdown syntax.
-- You can embed Pyxel games and run them during your presentation.
-- The source code is available here:
-  - https://github.com/shimizukawa/pyxel-slide-pyasia-2026
+  - With embedding Pyxel app!
 
+Also,
+
+Pyxel is the **FUN** game engine for making retro games!
+
+## ありがとうございました
+Thanks for listening!
+Maraming Salamat!
