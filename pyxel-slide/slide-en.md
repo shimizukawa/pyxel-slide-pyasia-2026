@@ -73,7 +73,7 @@ In this talk, I will give you the essence.
 
 ### How to use Pyxel for Retro Presentation Slides
 
-Here are the Pyxel-related features I used.<br>
+Here are the Essense of Pyxel API<br>
 
 - Displaying Japanese text
 - Image banks
@@ -153,7 +153,7 @@ Due to limitation
 colors and resolution,
 images can look blurry.
 
-### Embedding a Pyxel App 1/2
+### Embedding a Pyxel App Through img bank 1
 
 The mouse focuses on the child app, and control is passed to it.
 
@@ -163,7 +163,7 @@ The mouse focuses on the child app, and control is passed to it.
 :height: 165
 ```
 
-### Embedding a Pyxel App 2/2
+### Embedding a Pyxel App Through img bank 2
 
 The child app draws into an image bank, then blt on the slide.
 
@@ -177,14 +177,13 @@ The child app draws into an image bank, then blt on the slide.
 
 ### Slide Features of Retro Presentation Slides
 
-Here are the slide-related features I used. <br>
+Here are the essense of Parsing and Render Markdown<br>
 
 - Reference: Markdown Slide Renderers
 - Tech stack
 - Architecture
 - Layout, style, and behavior
 - Code fences (+ syntax highlighting)
-- Displaying images
 
 ### Reference: Markdown Slide Renderers
 
