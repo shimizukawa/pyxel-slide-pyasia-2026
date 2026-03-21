@@ -1,6 +1,6 @@
 # Creating Presentation Slides <br> with <br> the Retro Game Engine Pyxel
 
-Python ASIA 2026 \
+PythonASIA 2026 \
 2026.03.21 \
 @shimizukawa
 
@@ -8,16 +8,18 @@ Python ASIA 2026 \
 
 ### Introduction
 
-- What is this slide?
-- What is the Retro Game Engine Pyxel?
-- What is the Retro Presentation Slide?
-- What is a Markdown Slide Renderer?
+Agenda
+
+- This slide
+- The Retro Game Engine Pyxel
+- The Retro Presentation Slide
+- Markdown tools for Presentation
 
 ### What is this slide?
 
-This is "Retro Presentation Slide" built with "[Pyxel]" — a tool that lets you make retro games with Python.
-
-<br>
+"[Pyxel]" is a tool that lets you make Retro-Games with Python.
+I built this "Retro Presentation Slide" using Pyxel.
+I'm going to talk about how I did it.
 
 [Pyxel]: https://github.com/kitao/pyxel
 
@@ -25,28 +27,36 @@ This is "Retro Presentation Slide" built with "[Pyxel]" — a tool that lets you
 :scale: 70
 ```
 
-Author: @shimizukawa
-
 <br>
 
-- I started programming Around 1990, because I wanted to create games.
-- At that time, tools like C, ASM, and DirectX were too hard, so I never finished anything.
-- Now I'm using Pyxel to try again and build the games I always     dreamed of!
+Who am I?
+
+- Takayuki Shimizukawa
+- I used to maintain Sphinx - documentation generator.
+- I started programming Around 1990, to create games.
+- But, C, ASM, and DirectX were too hard to learn.
+- Now, Pyxel helps me create 1990-like games again and build the   games I always dreamed of!
 
 ### What is the Retro Game Engine Pyxel?
 
-- Pyxel is a retro game engine developed by Kitao-san
-- Pyxel is attractive because of:
-  - its ability to create NES-like retro games in Python
-  - its simple and intuitive API
-  - its expressive power limited to 16-colors and 4-sounds
-- On top of this strong Pyxel limitation, I created a presence-slide viewer that requires expressive power.
+Pyxel is a retro game engine for Python.
+Developed by Kitao-san.
+
+Pyxel is attractive:
+
+- Ability to create NES-like retro games in Python
+- Simple and intuitive API
+- Expressive power limited to 16-colors and 4-sounds
+
+According to Kitao-san,
+-- "No docs for the advanced API, you’ll improve your programming skills as you discover and master it."
+
+I like this philosophy!
 
 ### What are Retro Presentation Slides?
 
+On top of Pyxel limitation, I created a presentation-slide viewer that requires expressive power.
 
-- Retro Presentation Slides
-  - It's a presentation slide app that runs inside a retro game engine.
 - Why I made it
   - At [an event], I gave a talk called "Games I wanted to make in 1990, now built with Pyxel."
   - While making those slides, I thought: "What if the slides themselves were also built with Pyxel?" — and so I did it!
