@@ -69,17 +69,17 @@ In this talk, I will give you the essence.
 [an event]: https://www.freia.jp/taka/blog/2025/02/pyconshizuoka2024/index.html
 
 
-## Pyxel Features Used in<br>Retro Presentation Slides
+## How to use Pyxel for<br>Retro Presentation Slides
 
-### Pyxel Features Used in Retro Presentation Slides
+### How to use Pyxel for Retro Presentation Slides
 
 Here are the Pyxel-related features I used.<br>
 
 - Displaying Japanese text
 - Image banks
+- Slide-transition animation
 - Embedding images
-- Page-turn animation using dithering
-- Embedding a Pyxel app inside a slide
+- Embedding a Pyxel app
 
 ### Displaying Japanese Text
 
@@ -101,11 +101,11 @@ font_italic    = pyxel.Font("assets/b12_i.bdf")
 
 ### Image Banks
 
-I use multiple custom image banks to avoid conflicts.
+I use multiple custom Pyxel image banks for Expressive Power.
 
-- Two Pyxel image banks are used for the slide-transition animation.
-- Another bank holds the character images that match the slide progress.
-- Yet another bank is used to draw the child app and overlay it on the slide.
+- Two image banks are used for the slide-transition animation.
+- Another bank holds the character images.
+- Yet another bank is used for more features.
 
 ```python
 renderd_page_bank = [
@@ -115,7 +115,7 @@ renderd_page_bank = [
 player_image = pyxel.Image.from_image("assets/urban_rpg.png")
 ```
 
-### Page-Turn Animation with Dithering
+### Slide-Transition Animation with Dithering
 
 I use Pyxel's `dither` function to blend two slides together during a page transition.
             
@@ -131,7 +131,29 @@ pyxel.blt(new_x, new_y, new_img, 0, 0, WIDTH, HEIGHT, 7)
 pyxel.dither(1)
 ```
 
-### Embedding a Pyxel App in a Slide 1/2
+### Embedding images
+
+- Images are loaded using `pyxel.Image.from_image`.
+
+```python
+p = pyxel.Image.from_image(filename)
+s = 0.5
+img.blt(
+    x - int(w * (1 - s) / 2),
+    y - int(h * (1 - s) / 2),
+    p, 0, 0, w, h, scale=s,
+)
+```
+
+```{figure} assets/pyasia2026.png
+:scale: 70
+```
+
+Due to limitation
+colors and resolution,
+images can look blurry.
+
+### Embedding a Pyxel App 1/2
 
 The mouse focuses on the child app, and control is passed to it.
 
@@ -141,9 +163,9 @@ The mouse focuses on the child app, and control is passed to it.
 :height: 165
 ```
 
-### Embedding a Pyxel App in a Slide 2/2
+### Embedding a Pyxel App 2/2
 
-The child app draws into an image bank, which is then overlaid on the slide.
+The child app draws into an image bank, then blt on the slide.
 
 ```{figure} assets/jumpman.*
 :scale: 170
@@ -244,24 +266,6 @@ Supported Markdown syntax:
               self._text(value)
   ```
 
-
-### Displaying Images
-
-- Images are loaded using `pyxel.Image.from_image`.
-- However, since the screen resolution is low, large images can look blurry.
-
-```python
-p = pyxel.Image.from_image(filename)
-x, y, w, h = self.x, self.y, p.width, p.height
-s = 0.5
-self.img.blt(
-    x - int(w * (1 - s) / 2),
-    y - int(h * (1 - s) / 2),
-    p,
-    0, 0, w, h,
-    scale=s,
-)
-```
 
 ## Conclusion
 
