@@ -5,10 +5,10 @@
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
-#     "markdown-it-py",
-#     "linkify-it-py",
+#     "markdown-it-py[linkify]",
 #     "pygments",
 #     "pyxel",
+#     "websocket-client",
 # ]
 # ///
 from __future__ import annotations
@@ -25,6 +25,7 @@ from pathlib import Path
 from random import randint, choice
 
 import pyxel
+import ws
 
 
 MD_FILENAME = "slide-en.md"
@@ -415,6 +416,7 @@ class App:
         self.debug = debug
 
         # player
+        self.comm = ws.Comm(ws.WS_ADDR)
         self.player_image = pyxel.Image.from_image("assets/urban_rpg.png")
         # Place at position based on current page
         x = WIDTH * self.page // max(1, len(self.slides) - 1)
@@ -618,10 +620,19 @@ class App:
                 image[3],
                 8,
             )
+        self.comm.send(id=id(self), player=self.player)
 
     def blt_player(self):
         # Draw players
-        self.draw_players([{"player": self.player, "id": 0 }])
+        self.draw_players(
+            [
+                {
+                    "player": self.player,
+                    "id": 0,
+                },
+                *self.comm.others.values(),
+            ]
+        )
     
     def draw_loading(self):
         self.blt_player()
