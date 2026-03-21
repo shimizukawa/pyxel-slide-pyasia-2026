@@ -15,11 +15,11 @@ Agenda
 - The Retro Presentation Slide
 - Markdown tools for Presentation
 
-### What is this slide?
+### This slide
 
-"[Pyxel]" is a tool that lets you make Retro-Games with Python.
-I built this "Retro Presentation Slide" using Pyxel.
-I'm going to talk about how I did it.
+This slide is built with "[Pyxel]".
+Not just impl directly, you can show your own Markdown on it!
+I'm going to talk about the essence.
 
 [Pyxel]: https://github.com/kitao/pyxel
 
@@ -32,21 +32,19 @@ I'm going to talk about how I did it.
 Who am I?
 
 - Takayuki Shimizukawa
-- I used to maintain Sphinx - documentation generator.
-- I started programming Around 1990, to create games.
-- But, C, ASM, and DirectX were too hard to learn.
+- Co-maintainer of Sphinx
+- To create games, I started programming in 199x
+- But, C, ASM, and DirectX were too hard to learn
 - Now, Pyxel helps me create 1990-like games again and build the   games I always dreamed of!
 
 ### What is the Retro Game Engine Pyxel?
 
-Pyxel is a retro game engine for Python.
-Developed by Kitao-san.
+*PYXEL* is developed by Kitao-san.
+**ATTRACTIVE**  points:
 
-Pyxel is attractive:
-
-- Ability to create NES-like retro games in Python
+- Retro ( NES-like ) Visual
 - Simple and intuitive API
-- Expressive power limited to 16-colors and 4-sounds
+- Limited expressive power (Color, sound, resolution, ...)
 
 According to Kitao-san,
 -- "No docs for the advanced API, you’ll improve your programming skills as you discover and master it."
@@ -55,13 +53,18 @@ I like this philosophy!
 
 ### What are Retro Presentation Slides?
 
-On top of Pyxel limitation, I created a presentation-slide viewer that requires expressive power.
+On top of Pyxel limitation, I created a Presentation viewer that **REQUIRES** expressive power.
 
-- Why I made it
-  - At [an event], I gave a talk called "Games I wanted to make in 1990, now built with Pyxel."
-  - While making those slides, I thought: "What if the slides themselves were also built with Pyxel?" — and so I did it!
+Why?
 
-I will explain how I built it.
+- At [an event], I talked about my prog roots were in game prog.
+- I realized that creating presentation slides with Pyxel would be a **FUN**!
+- And so I did it!
+
+How?
+
+In my Sphinx dev experience, I know how to parse text and render it, which libraries to use, how to combine them.
+In this talk, I will give you the essence.
 
 [an event]: https://www.freia.jp/taka/blog/2025/02/pyconshizuoka2024/index.html
 
