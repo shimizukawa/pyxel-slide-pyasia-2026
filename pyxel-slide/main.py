@@ -603,13 +603,13 @@ class App:
         self.player = (x, y, u, v)
 
     def draw_players(self, players):
-        players = sorted(players, key=lambda o: o["player"][1])
         for obj in players:
             x, y, u, v = obj["player"]
             if idx := obj["id"]:
                 idx = sum(obj["id"].encode("utf8")) % (len(HUMAN_IMAGES) - 1) + 1
             image = HUMAN_IMAGES[idx]
 
+            pyxel.dither(obj.get("dither", 0.5))
             pyxel.blt(
                 x,
                 y - 1,
@@ -620,17 +620,20 @@ class App:
                 image[3],
                 8,
             )
+        pyxel.dither(1)
         self.comm.send(id=id(self), player=self.player)
 
     def blt_player(self):
         # Draw players
         self.draw_players(
             [
+                *self.comm.others.values(),
+                # player (my self) should be drawn on top of others
                 {
                     "player": self.player,
                     "id": 0,
+                    "dither": 1.0,
                 },
-                *self.comm.others.values(),
             ]
         )
     
