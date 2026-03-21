@@ -1,4 +1,4 @@
-# Python ASIA 2026 / 2026.03.21 @ Manila, Philippines
+# PythonASIA 2026 / 2026.03.21 @ Manila, Philippines
 
 ## Links for PythonASIA 2026
 
