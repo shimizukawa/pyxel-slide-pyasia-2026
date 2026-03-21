@@ -1,5 +1,8 @@
 # PythonASIA 2026 / 2026.03.21 @ Manila, Philippines
 
+- Event: https://2026.pythonasia.org/
+- Talk: https://pretalx.com/python-asia-2026/talk/SHDM83/
+
 ## Links for PythonASIA 2026
 
 1. Pyxel Repo https://github.com/kitao/pyxel
