@@ -221,7 +221,7 @@ Libraries used
 
 <br>
 
-I also referred to these for implementation, syntax, and behavior:
+I also referred to these for implementation, syntax, and behaviors:
 
 - `myst-parser`: Extended Markdown syntax
 - `sphinx-revealjs`: Sphinx extension for Reveal.js
@@ -230,7 +230,7 @@ I also referred to these for implementation, syntax, and behavior:
 
 1. Loading
    - `markdownit-py` splits the Markdown into tokens.
-   - Tokens are stored in a tree structure, organized by slide.
+   - Tokens are stored in a tree structure (such as AST).
 2. Rendering
    - The current page is rendered using the Visitor pattern.
    - Text is laid out based on the Markdown syntax.
