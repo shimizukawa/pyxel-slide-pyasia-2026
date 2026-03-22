@@ -25,6 +25,7 @@ HEIGHT = 180
 CHAR_WIDTH = 6
 LINE_HEIGHT = 14
 MAX_LINES = 8
+TIME = 30
 
 font = pyxel.Font("assets/umplus_j12r.bdf")
 
@@ -213,8 +214,8 @@ class App:
             else:
                 # なにもしない
                 return
-        elif self.time >= 60 or self.wordset.is_finished:
-            # スタート後60秒以上経過しているか、全ての単語を入力した
+        elif self.time >= TIME or self.wordset.is_finished:
+            # スタート後TIME秒以上経過しているか、全ての単語を入力した
             self.finish()
             return
 
@@ -253,7 +254,7 @@ class App:
     def render(self):
         g = self.img
         g.cls(1)
-        g.text(8, 8, f"TIME: {self.time: >4.1f} / 60", 7, font)
+        g.text(8, 8, f"TIME: {self.time: >4.1f} / {TIME}", 7, font)
         g.text(8, 20, f"WORDS: {self.wordset.word_pos: >2}", 7, font)
         g.text(120, 8, f"TYPE: {self.score: >5}", 7, font)
         g.text(120, 20, f"TPM: {self.tpm: >8.1f}", 7, font)
