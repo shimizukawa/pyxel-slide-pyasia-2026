@@ -193,7 +193,7 @@ Here are the essense of Parsing and Render Markdown<br>
 
 ### Reference: Markdown Slide Renderers
 
-Using Markdown to write slides is very convenient.
+There are useful tools converting Markdown to slides.
 You don't have to worry about layout, and it's easy to share and reuse.
 
 There are several tools that convert Markdown into HTML slides.
