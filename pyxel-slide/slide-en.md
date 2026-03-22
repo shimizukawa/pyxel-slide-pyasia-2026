@@ -68,6 +68,12 @@ In this talk, I will give you the essence.
 
 [an event]: https://www.freia.jp/taka/blog/2025/02/pyconshizuoka2024/index.html
 
+### Keywords
+
+- A waste of technology
+- Experimentation
+- Just Fun
+
 
 ## How to use Pyxel for<br>Retro Presentation Slides
 
@@ -268,9 +274,13 @@ Supported Markdown syntax:
 
 ## Conclusion
 
+### Keywords
+
+- A waste of technology
+- Experimentation
+- Just Fun
 
 ### Conclusion
-
 
 - I built retro-style presentation slides using Pyxel.
 - You can create slides using Markdown syntax.
