@@ -2,6 +2,7 @@
 
 - Event: https://2026.pythonasia.org/
 - Talk: https://pretalx.com/python-asia-2026/talk/SHDM83/
+- Slide: https://shimizukawa.github.io/pyxel-slide-pyasia-2026/
 
 ## Links for PythonASIA 2026
 
