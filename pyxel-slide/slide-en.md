@@ -79,7 +79,7 @@ In this talk, I will give you the essence.
 
 ### How to use Pyxel for Retro Presentation Slides
 
-Here are the Essense of Pyxel API<br>
+Here are the Essense of Pyxel API for this<br>
 
 - Displaying Japanese text
 - Image banks
@@ -94,8 +94,8 @@ I used Japanese 日本語 BDF fonts (Bitmap Distribution Format).
 - BDF is a text-based format that stores bitmap images for each character code.
 - I used fonts from http://openlab.ring.gr.jp/efont/unicode/
   - They support Japanese with Unicode and come in large sizes.
-- I did NOT use tools that convert TrueType fonts to BDF.
-  - I wanted to avoid licensing and distribution issues.
+- There are some TrueType fonts converter to BDF.
+  - But I did NOT use to avoid licensing issues
 
 ```python
 font_title     = pyxel.Font("assets/b24.bdf")

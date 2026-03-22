@@ -289,7 +289,7 @@ class Paging:
 
     def draw(self, font: pyxel.Font | None = None):
         if self._changed_frame + 60 > pyxel.frame_count:
-            pyxel.text(0, 0, f"Paging Mode: {self.mode.name}", 0, font)
+            pyxel.text(0, 0, f"Paging Mode: {self.mode.name}", 8, font)
 
 
 class ChildAppProxy:
